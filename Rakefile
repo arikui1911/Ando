@@ -9,7 +9,7 @@ file RESULT => SRC + IMP do |t|
 end
 
 task :unittest => SRC + IMP do |t|
-  sh "dmd", "-unittest", "-I./import", "-of#{t.name}", *IMP, "-run", *SRC
+  sh "dmd", "-unittest", "-I./import", *IMP, "-run", *SRC
 end
 
 task default: 'unittest'
