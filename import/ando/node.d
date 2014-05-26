@@ -583,6 +583,31 @@ enum Operators {
     NOT,
 }
 
+private bool do_compare(T)(Operators op, T x, T y){
+    switch (op){
+    case Operators.EQ: return x == y;
+    case Operators.NE: return x != y;
+    case Operators.GE: return x >= y;
+    case Operators.LE: return x <= y;
+    case Operators.GT: return x > y;
+    case Operators.LT: return x < y;
+    default:
+        assert(0);
+    }
+}
+
+private T do_arith(T)(Operators op, T x, T y){
+    switch (op){
+    case Operators.ADD: return lval + rval;
+    case Operators.SUB: return lval - rval;
+    case Operators.MUL: return lval * rval;
+    case Operators.DIV: return lval / rval;
+    case Operators.MOD: return lval % rval;
+    default:
+        assert(0);
+    }
+}
+
 class BinaryExpr : Node {
     import std.conv;
 
@@ -617,56 +642,9 @@ class BinaryExpr : Node {
             int lval = (cast(IntegerLiteral)left).value;
 
             if (op < Operators.ADD) {
-                bool r;
-
-                switch (op){
-                case Operators.EQ:
-                    r = (lval == rval);
-                    break;
-                case Operators.NE:
-                    r = (lval != rval);
-                    break;
-                case Operators.GE:
-                    r = (lval >= rval);
-                    break;
-                case Operators.LE:
-                    r = (lval <= rval);
-                    break;
-                case Operators.GT:
-                    r = (lval > rval);
-                    break;
-                case Operators.LT:
-                    r = (lval < rval);
-                    break;
-                default:
-                    assert(0);
-                }
-
-                return r ? new TrueLiteral(line) : new FalseLiteral(line);
+                return do_compare!int(op, lval, rval) ? new TrueLiteral(line) : new FalseLiteral(line);
             } else {
-                int r;
-
-                switch (op){
-                case Operators.ADD:
-                    r = lval + rval;
-                    break;
-                case Operators.SUB:
-                    r = lval - rval;
-                    break;
-                case Operators.MUL:
-                    r = lval * rval;
-                    break;
-                case Operators.DIV:
-                    r = lval / rval;
-                    break;
-                case Operators.MOD:
-                    r = lval % rval;
-                    break;
-                default:
-                    assert(0);
-                }
-
-                return new IntegerLiteral(line, r);
+                return new IntegerLiteral(line, do_arith!int(op, lval, rval));
             }
         } else if (left.tag == NodeTags.FLOATING_LITERAL) {
             double rval;
@@ -682,56 +660,9 @@ class BinaryExpr : Node {
             double lval = (cast(FloatingLiteral)left).value;
 
             if (op < Operators.ADD) {
-                bool r;
-
-                switch (op){
-                case Operators.EQ:
-                    r = (lval == rval);
-                    break;
-                case Operators.NE:
-                    r = (lval != rval);
-                    break;
-                case Operators.GE:
-                    r = (lval >= rval);
-                    break;
-                case Operators.LE:
-                    r = (lval <= rval);
-                    break;
-                case Operators.GT:
-                    r = (lval > rval);
-                    break;
-                case Operators.LT:
-                    r = (lval < rval);
-                    break;
-                default:
-                    assert(0);
-                }
-
-                return r ? new TrueLiteral(line) : new FalseLiteral(line);
+                return do_compare!double(op, lval, rval) ? new TrueLiteral(line) : new FalseLiteral(line);
             } else {
-                double r;
-
-                switch (op){
-                case Operators.ADD:
-                    r = lval + rval;
-                    break;
-                case Operators.SUB:
-                    r = lval - rval;
-                    break;
-                case Operators.MUL:
-                    r = lval * rval;
-                    break;
-                case Operators.DIV:
-                    r = lval / rval;
-                    break;
-                case Operators.MOD:
-                    r = lval % rval;
-                    break;
-                default:
-                    assert(0);
-                }
-
-                return new FloatingLiteral(line, r);
+                return new FloatingLiteral(line, do_arith!double(op, lval, rval));
             }
         } else if (left.tag == NodeTags.STRING_LITERAL) {
             string str;
