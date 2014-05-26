@@ -289,6 +289,15 @@ class WrappedList(T) {
         return this;
     }
 
+    int opApply(int delegate(ref T) dg){
+        int r = 0;
+        foreach (e; list.data) {
+            r = dg(e);
+            if (r) break;
+        }
+        return r;
+    }
+
     int opApply(int delegate(int, ref T) dg){
         int r = 0;
         foreach (i, e; list.data) {
@@ -938,6 +947,9 @@ class ArrayLiteral : Node {
             }
             arg.expr.dump(nest + 1);
         }
+    }
+    
+    override void compile(Compiler c){
     }
 }
 
